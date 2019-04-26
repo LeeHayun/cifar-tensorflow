@@ -15,34 +15,65 @@ cfg = {
 
 class VggNet(object):
 	"""docstring for VggNet"""
-	def __init__(self, vggname,is_training,keep_prob = 0.5,num_classes=10):
+	def __init__(self, vggname,is_training,keep_prob = 0.5,num_classes=10, group=1, scale=1.):
 		super(VggNet, self).__init__()
 		self.vggname = vggname 
 		self.num_classes = num_classes
 
 		self.regularizer = tf.contrib.layers.l2_regularizer(scale=5e-4)
-		self.initializer = tf.contrib.layers.xavier_initializer()
+		#self.initializer = tf.contrib.layers.xavier_initializer()
+		self.initializer = tf.contrib.layers.variance_scaling_initializer()
 
 		self.pool_num = 0
 		self.conv_num = 0
 		self.is_training = is_training
 
 		self.keep_prob = keep_prob
+
+                self.group = group
+                self.scale = scale
 		
 	def forward(self,input):
+                hidden = int(4096*self.scale)
+
 		out = self.make_layer(input,cfg[self.vggname])
 		out = tf.layers.flatten(out,name='flatten')
-		predicts = tf.layers.dense(out,units=self.num_classes,kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name='fc_1')
+                
+                out = tf.layers.dense(out,units=hidden,activation=tf.nn.relu,
+                        kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name='fc_1')
+                out = tf.layers.dropout(out,rate=self.keep_prob,name='dropout1')
+
+                out = tf.layers.dense(out,units=hidden,activation=tf.nn.relu,
+                        kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name='fc_2')
+                out = tf.layers.dropout(out,rate=self.keep_prob,name='dropout2')
+
+		predicts = tf.layers.dense(out,units=self.num_classes,
+                        kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name='fc_3')
 		softmax_out = tf.nn.softmax(predicts,name='output')
 		return predicts,softmax_out
 
 
 	def conv2d(self,inputs,out_channel):
-		inputs = tf.layers.conv2d(inputs,filters=out_channel,kernel_size=3,padding='same',
-					kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name='conv_'+str(self.conv_num))
-		inputs = tf.layers.batch_normalization(inputs,training=self.is_training,name='bn_'+str(self.conv_num))
+                conv_layers = []
+                channels = inputs.get_shape()[3].value
+
+                if channels > 3:
+                    group = self.group
+                    in_sz = int(channels * self.scale / group)
+                    out_sz = int(out_channel * self.scale / group)
+                else:
+                    group = 1
+                    in_sz = channels
+                    out_sz = int(out_channel * self.scale)
+
+                for g in range(group):
+                    output = tf.layers.conv2d(inputs[:,:,:,in_sz*g:in_sz*(g+1)],filters=out_sz,kernel_size=3,padding='same',
+                                            kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name='conv_'+str(self.conv_num)+'_g'+str(g))
+                    #inputs = tf.layers.batch_normalization(inputs,training=self.is_training,name='bn_'+str(self.conv_num))
+                    conv_layers.append(output)
+                conv_concat = tf.concat(conv_layers, axis=-1)
 		self.conv_num+=1
-		return tf.nn.relu(inputs)
+		return tf.nn.relu(conv_concat)
 
 	def make_layer(self,inputs,netparam):
 		for param in netparam:
@@ -71,8 +102,8 @@ def vgg13(is_training=True,keep_prob=0.5):
 	return net 
 
 
-def vgg16(is_training=True,keep_prob=0.5):
-	net = VggNet(vggname='VGG16',is_training=is_training,keep_prob=keep_prob)
+def vgg16(is_training=True,keep_prob=0.5,group=1,scale=1.):
+	net = VggNet(vggname='VGG16',is_training=is_training,keep_prob=keep_prob,group=group,scale=scale)
 	return net 
 
 

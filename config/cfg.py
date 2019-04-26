@@ -12,7 +12,9 @@ common_params = {
 	'moment':0.9,
 	'display_step':100,
 	'num_epochs':200,
-	'predict_step':500
+	'predict_step':500,
+        'group':1,
+        'scale':1.
 }
 
 
@@ -40,4 +42,6 @@ def merge_params(FLAGS):
 	common_params['display_step'] = FLAGS.display_step
 	common_params['num_epochs'] = FLAGS.num_epochs
 	common_params['predict_step'] = FLAGS.predict_step
+        common_params['group'] = FLAGS.group
+        common_params['scale'] = FLAGS.scale
 	return common_params

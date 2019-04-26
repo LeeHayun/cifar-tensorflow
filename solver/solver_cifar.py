@@ -32,15 +32,17 @@ class Solver(object):
 
 		self.display_step = common_params['display_step']
 		self.predict_step = common_params['predict_step']
+		self.group = common_params['group']
+		self.scale = common_params['scale']
 
 		self.netname =netname
-		model_dir = os.path.join(dataset_params['model_path'],self.netname,'ckpt')
+		model_dir = os.path.join(dataset_params['model_path'],self.netname+'_'+str(self.group)+'_'+str(self.scale),'ckpt')
 		if not tf.gfile.Exists(model_dir):
 			tf.gfile.MakeDirs(model_dir)
 		self.model_name = os.path.join(model_dir,'model.ckpt')
 
 
-		self.log_dir = os.path.join(dataset_params['model_path'],self.netname,'log')
+		self.log_dir = os.path.join(dataset_params['model_path'],self.netname+'_'+str(self.group)+'_'+str(self.scale),'log')
 		if not tf.gfile.Exists(self.log_dir):
 			tf.gfile.MakeDirs(self.log_dir)
 
@@ -54,7 +56,7 @@ class Solver(object):
 		self.is_training = tf.placeholder_with_default(False,None,name='is_training')
 		self.keep_prob = tf.placeholder(tf.float32,None,name='keep_prob')
 
-		self.net = eval(self.netname)(is_training=self.is_training,keep_prob=self.keep_prob)
+		self.net = eval(self.netname)(is_training=self.is_training,keep_prob=self.keep_prob,group=self.group,scale=self.scale)
 
 		self.predicts,self.softmax_out = self.net.forward(self.images)
 		self.total_loss = self.net.loss(self.predicts,self.labels)

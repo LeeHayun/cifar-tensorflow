@@ -55,6 +55,8 @@ def preprocess_image(image, is_training):
 		image = tf.image.resize_image_with_crop_or_pad(image,_HEIGHT+8,_WIDTH+8)
 		image = tf.random_crop(image,[_HEIGHT,_WIDTH,_NUM_CHANNELS])
 		image = tf.image.random_flip_left_right(image)
+                image = tf.image.random_brightness(image, max_delta=63)
+                image = tf.image.random_contrast(image, lower=0.2, upper=1.8)
 	image = tf.image.per_image_standardization(image)
 	return image
 
