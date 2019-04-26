@@ -36,13 +36,13 @@ class Solver(object):
 		self.scale = common_params['scale']
 
 		self.netname =netname
-		model_dir = os.path.join(dataset_params['model_path'],self.netname+'_'+str(self.group)+'_'+str(self.scale),'ckpt')
+		model_dir = os.path.join(dataset_params['model_path'],self.netname+'_'+str(self.learning_rate)+'_'+str(self.group)+'_'+str(self.scale),'ckpt')
 		if not tf.gfile.Exists(model_dir):
 			tf.gfile.MakeDirs(model_dir)
 		self.model_name = os.path.join(model_dir,'model.ckpt')
 
 
-		self.log_dir = os.path.join(dataset_params['model_path'],self.netname+'_'+str(self.group)+'_'+str(self.scale),'log')
+		self.log_dir = os.path.join(dataset_params['model_path'],self.netname+'_'+str(self.learning_rate)+'_'+str(self.group)+'_'+str(self.scale),'log')
 		if not tf.gfile.Exists(self.log_dir):
 			tf.gfile.MakeDirs(self.log_dir)
 

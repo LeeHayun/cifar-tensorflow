@@ -14,13 +14,14 @@ from network.vgg import vgg11,vgg13,vgg16,vgg19
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-n','--net',type=str,default='vgg11',choices=cfg.net_style,help='net style')
+parser.add_argument('--lr',type=float,default=0.1,help='cifar_10 learning_rate')
 parser.add_argument('--group',type=int,default=1,help='number of groups')
 parser.add_argument('--scale',type=float,default=1.,help='scale factor')
 
 
 
 def main_ckpt(_):
-	model_folder = os.path.join(cfg.dataset_params['model_path'],FLAGS.net+'_'+str(FLAGS.group)+'_'+str(FLAGS.scale),'ckpt')
+	model_folder = os.path.join(cfg.dataset_params['model_path'],FLAGS.net+'_'+str(FLAGS.lr)+'_'+str(FLAGS.group)+'_'+str(FLAGS.scale),'ckpt')
 	checkpoint = tf.train.get_checkpoint_state(model_folder)
 	input_checkpoint = checkpoint.model_checkpoint_path
 	saver = tf.train.import_meta_graph(input_checkpoint + '.meta', clear_devices=True) 
@@ -35,14 +36,14 @@ def main_ckpt(_):
 	images,labels = sess.run(test_Loader)
 	total_count = 0
 	count = 1
-	for i in range(0,len(images),50):
-		image = images[i:i+50,:,:,:]
+	for i in range(0,len(images),500):
+		image = images[i:i+500,:,:,:]
 		predict = sess.run(cfg.graph_node['output'],feed_dict={cfg.graph_node['input']:image,cfg.graph_node['is_training']:False,cfg.graph_node['keep_prob']:1.0})
-		correct_pred = tf.equal(tf.argmax(predict,1,output_type=tf.int32),labels[i:i+50])
+		correct_pred = tf.equal(tf.argmax(predict,1,output_type=tf.int32),labels[i:i+500])
 		acc = tf.reduce_sum(tf.cast(correct_pred,tf.float32))
 		total_count+=sess.run(acc)
-		accuracy = total_count/(count*50)
-		print("test samples:%d,accuracy:%d/%d = %.4f " %(count*50,total_count,count*50,accuracy))
+		accuracy = total_count/(count*500)
+		print("test samples:%d,accuracy:%d/%d = %.4f " %(count*500,total_count,count*500,accuracy))
 		count+=1
 	sess.close()
 
@@ -70,10 +71,10 @@ def main_pb(_):
 
 	sess = tf.Session(config=config,graph=graph)
 	total_count = 0
-	for i in range(0,len(images),50):
-		image = images[i:i+50,:,:,:]
+	for i in range(0,len(images),500):
+		image = images[i:i+500,:,:,:]
 		predict = sess.run(_predict,feed_dict={inputs:image})
-		correct_pred = tf.equal(tf.argmax(predict,1,output_type=tf.int32),labels[i:i+50])
+		correct_pred = tf.equal(tf.argmax(predict,1,output_type=tf.int32),labels[i:i+500])
 		acc = tf.reduce_sum(tf.cast(correct_pred,tf.float32))
 		total_count+=sess1.run(acc)
 		accuracy = total_count/(i+1)
