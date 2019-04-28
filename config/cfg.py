@@ -14,7 +14,8 @@ common_params = {
 	'num_epochs':200,
 	'predict_step':500,
         'group':1,
-        'scale':1.
+        'scale':1.,
+        'num_try':1
 }
 
 
@@ -44,4 +45,5 @@ def merge_params(FLAGS):
 	common_params['predict_step'] = FLAGS.predict_step
         common_params['group'] = FLAGS.group
         common_params['scale'] = FLAGS.scale
+        common_params['num_try'] = FLAGS.num_try
 	return common_params

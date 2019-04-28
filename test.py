@@ -17,11 +17,12 @@ parser.add_argument('-n','--net',type=str,default='vgg11',choices=cfg.net_style,
 parser.add_argument('--lr',type=float,default=0.1,help='cifar_10 learning_rate')
 parser.add_argument('--group',type=int,default=1,help='number of groups')
 parser.add_argument('--scale',type=float,default=1.,help='scale factor')
+parser.add_argument('--num_try',type=int,default=1,help='number of tries')
 
-
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
 def main_ckpt(_):
-	model_folder = os.path.join(cfg.dataset_params['model_path'],FLAGS.net+'_'+str(FLAGS.lr)+'_'+str(FLAGS.group)+'_'+str(FLAGS.scale),'ckpt')
+	model_folder = os.path.join(cfg.dataset_params['model_path'],FLAGS.net+'_'+str(FLAGS.lr)+'_'+str(FLAGS.group)+'_'+str(FLAGS.scale)+'_try'+str(FLAGS.num_try),'ckpt')
 	checkpoint = tf.train.get_checkpoint_state(model_folder)
 	input_checkpoint = checkpoint.model_checkpoint_path
 	saver = tf.train.import_meta_graph(input_checkpoint + '.meta', clear_devices=True) 

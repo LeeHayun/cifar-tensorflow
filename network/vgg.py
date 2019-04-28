@@ -59,12 +59,11 @@ class VggNet(object):
 
                 if channels > 3:
                     group = self.group
-                    in_sz = int(channels * self.scale / group)
-                    out_sz = int(out_channel * self.scale / group)
                 else:
                     group = 1
-                    in_sz = channels
-                    out_sz = int(out_channel * self.scale)
+
+                in_sz = int(channels / group)
+                out_sz = int(out_channel * self.scale / group)
 
                 for g in range(group):
                     output = tf.layers.conv2d(inputs[:,:,:,in_sz*g:in_sz*(g+1)],filters=out_sz,kernel_size=3,padding='same',

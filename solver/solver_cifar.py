@@ -34,15 +34,16 @@ class Solver(object):
 		self.predict_step = common_params['predict_step']
 		self.group = common_params['group']
 		self.scale = common_params['scale']
+                self.num_try = common_params['num_try']
 
 		self.netname =netname
-		model_dir = os.path.join(dataset_params['model_path'],self.netname+'_'+str(self.learning_rate)+'_'+str(self.group)+'_'+str(self.scale),'ckpt')
+		model_dir = os.path.join(dataset_params['model_path'],self.netname+'_'+str(self.learning_rate)+'_'+str(self.group)+'_'+str(self.scale)+'_try'+str(self.num_try),'ckpt')
 		if not tf.gfile.Exists(model_dir):
 			tf.gfile.MakeDirs(model_dir)
 		self.model_name = os.path.join(model_dir,'model.ckpt')
 
 
-		self.log_dir = os.path.join(dataset_params['model_path'],self.netname+'_'+str(self.learning_rate)+'_'+str(self.group)+'_'+str(self.scale),'log')
+		self.log_dir = os.path.join(dataset_params['model_path'],self.netname+'_'+str(self.learning_rate)+'_'+str(self.group)+'_'+str(self.scale)+'_try'+str(self.num_try),'log')
 		if not tf.gfile.Exists(self.log_dir):
 			tf.gfile.MakeDirs(self.log_dir)
 
