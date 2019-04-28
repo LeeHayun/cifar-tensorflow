@@ -18,6 +18,7 @@ parser.add_argument('--lr',type=float,default=0.1,help='cifar_10 learning_rate')
 parser.add_argument('--group',type=int,default=1,help='number of groups')
 parser.add_argument('--scale',type=float,default=1.,help='scale factor')
 parser.add_argument('--num_try',type=int,default=1,help='number of tries')
+parser.add_argument('--use_shuffle',type=bool,default=False,help='use shuffle layer')
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 

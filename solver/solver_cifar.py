@@ -35,6 +35,7 @@ class Solver(object):
 		self.group = common_params['group']
 		self.scale = common_params['scale']
                 self.num_try = common_params['num_try']
+                self.use_shuffle = common_params['use_shuffle']
 
 		self.netname =netname
 		model_dir = os.path.join(dataset_params['model_path'],self.netname+'_'+str(self.learning_rate)+'_'+str(self.group)+'_'+str(self.scale)+'_try'+str(self.num_try),'ckpt')
@@ -57,7 +58,7 @@ class Solver(object):
 		self.is_training = tf.placeholder_with_default(False,None,name='is_training')
 		self.keep_prob = tf.placeholder(tf.float32,None,name='keep_prob')
 
-		self.net = eval(self.netname)(is_training=self.is_training,keep_prob=self.keep_prob,group=self.group,scale=self.scale)
+		self.net = eval(self.netname)(is_training=self.is_training,keep_prob=self.keep_prob,group=self.group,scale=self.scale,use_shuffle=self.use_shuffle)
 
 		self.predicts,self.softmax_out = self.net.forward(self.images)
 		self.total_loss = self.net.loss(self.predicts,self.labels)

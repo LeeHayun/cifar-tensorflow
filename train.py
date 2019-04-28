@@ -21,6 +21,7 @@ parser.add_argument('-n','--net',type=str,default='vgg11',choices=cfg.net_style,
 parser.add_argument('--group',type=int,default=1,help='number of groups')
 parser.add_argument('--scale',type=float,default=1.,help='scale factor')
 parser.add_argument('--num_try',type=int,default=1,help='number of tries')
+parser.add_argument('--use_shuffle',type=bool,default=False,help='use shuffle layer')
 
 
 def main(_):

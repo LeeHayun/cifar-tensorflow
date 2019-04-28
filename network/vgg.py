@@ -15,7 +15,7 @@ cfg = {
 
 class VggNet(object):
 	"""docstring for VggNet"""
-	def __init__(self, vggname,is_training,keep_prob = 0.5,num_classes=10, group=1, scale=1.):
+	def __init__(self, vggname,is_training,keep_prob = 0.5,num_classes=10, group=1, scale=1., use_shuffle=False):
 		super(VggNet, self).__init__()
 		self.vggname = vggname 
 		self.num_classes = num_classes
@@ -27,6 +27,7 @@ class VggNet(object):
 		self.pool_num = 0
 		self.conv_num = 0
 		self.is_training = is_training
+                self.use_shuffle = use_shuffle
 
 		self.keep_prob = keep_prob
 
@@ -71,6 +72,17 @@ class VggNet(object):
                     #inputs = tf.layers.batch_normalization(inputs,training=self.is_training,name='bn_'+str(self.conv_num))
                     conv_layers.append(output)
                 conv_concat = tf.concat(conv_layers, axis=-1)
+
+                def channel_shuffle(x, num_groups):
+                    n, h, w, c = x.shape.as_list()
+                    x_reshaped = tf.reshape(x, [-1, h, w, num_groups, c // num_groups])
+                    x_transposed = tf.transpose(x_reshaped, [0, 1, 2, 4, 3])
+                    output = tf.reshape(x_transposed, [-1, h, w, c])
+                    return output
+
+                if self.use_shuffle:
+                    conv_concat = channel_shuffle(conv_concat, group)
+
 		self.conv_num+=1
 		return tf.nn.relu(conv_concat)
 
@@ -101,8 +113,8 @@ def vgg13(is_training=True,keep_prob=0.5):
 	return net 
 
 
-def vgg16(is_training=True,keep_prob=0.5,group=1,scale=1.):
-	net = VggNet(vggname='VGG16',is_training=is_training,keep_prob=keep_prob,group=group,scale=scale)
+def vgg16(is_training=True,keep_prob=0.5,group=1,scale=1.,use_shuffle=False):
+	net = VggNet(vggname='VGG16',is_training=is_training,keep_prob=keep_prob,group=group,scale=scale,use_shuffle=use_shuffle)
 	return net 
 
 

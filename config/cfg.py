@@ -15,7 +15,8 @@ common_params = {
 	'predict_step':500,
         'group':1,
         'scale':1.,
-        'num_try':1
+        'num_try':1,
+        'use_shuffle':False
 }
 
 
@@ -46,4 +47,5 @@ def merge_params(FLAGS):
         common_params['group'] = FLAGS.group
         common_params['scale'] = FLAGS.scale
         common_params['num_try'] = FLAGS.num_try
+        common_params['use_shuffle'] = FLAGS.use_shuffle
 	return common_params
